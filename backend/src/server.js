@@ -13,6 +13,9 @@ app.use('/api/auth', authRoutes);
 const wadahRoutes = require('./routes/wadah');
 app.use('/api/wadah', wadahRoutes);
 
+const chatRoutes = require('./routes/chat');
+app.use('/api/chat', chatRoutes);
+
 // Endpoint uji untuk memastikan server dan database terhubung
 app.get('/api/health', async (req, res) => {
   try {

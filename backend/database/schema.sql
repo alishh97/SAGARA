@@ -35,3 +35,27 @@ CREATE TABLE parameter_air (
   ph NUMERIC(4,2),
   tanggal_catat TIMESTAMP DEFAULT NOW()
 );
+
+CREATE TABLE pesan_chat (
+  id_pesan SERIAL PRIMARY KEY,
+  id_wadah INT NOT NULL REFERENCES wadah(id_wadah) ON DELETE CASCADE,
+  pengirim VARCHAR(20) NOT NULL CHECK (pengirim IN ('PENGGUNA', 'AI')),
+  isi_pesan TEXT NOT NULL,
+  waktu_kirim TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE log_penggunaan_ai (
+  id_log SERIAL PRIMARY KEY,
+  id_pengguna INT NOT NULL REFERENCES pengguna(id_pengguna) ON DELETE CASCADE,
+  jenis_layanan VARCHAR(15) NOT NULL CHECK (jenis_layanan IN ('CHATBOT', 'ANALISIS_FOTO')),
+  status VARCHAR(20) NOT NULL,
+  waktu TIMESTAMP DEFAULT NOW()
+);
+
+
+
+
+
+
+
+
