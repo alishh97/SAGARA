@@ -10,6 +10,9 @@ app.use(express.json());
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
+const wadahRoutes = require('./routes/wadah');
+app.use('/api/wadah', wadahRoutes);
+
 // Endpoint uji untuk memastikan server dan database terhubung
 app.get('/api/health', async (req, res) => {
   try {
