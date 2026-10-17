@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/auth'
 import LoginView from '@/views/LoginView.vue'
 import RegistrasiView from '@/views/RegistrasiView.vue'
 import DashboardView from '@/views/DashboardView.vue'
+import TambahWadahView from '@/views/TambahWadahView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -11,6 +12,7 @@ const router = createRouter({
     { path: '/registrasi', component: RegistrasiView, meta: { tamu: true } },
     // Sementara: halaman utama diarahkan ke login sampai dashboard dibuat
     { path: '/', component: DashboardView },
+    { path: '/wadah/tambah', component: TambahWadahView },
   ],
 })
 
