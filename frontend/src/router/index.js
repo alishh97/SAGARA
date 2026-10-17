@@ -5,6 +5,7 @@ import RegistrasiView from '@/views/RegistrasiView.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import TambahWadahView from '@/views/TambahWadahView.vue'
 import DetailWadahView from '@/views/DetailWadahView.vue'
+import ChatbotView from '@/views/ChatbotView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -15,6 +16,7 @@ const router = createRouter({
     { path: '/', component: DashboardView },
     { path: '/wadah/tambah', component: TambahWadahView },
     { path: '/wadah/:id', component: DetailWadahView },
+    { path: '/chatbot', component: ChatbotView },
   ],
 })
 
