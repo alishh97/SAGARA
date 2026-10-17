@@ -52,6 +52,14 @@ CREATE TABLE log_penggunaan_ai (
   waktu TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TABLE analisis_foto (
+  id_analisis SERIAL PRIMARY KEY,
+  id_wadah INT NOT NULL REFERENCES wadah(id_wadah) ON DELETE CASCADE,
+  path_foto VARCHAR(255) NOT NULL,
+  hasil_analisis TEXT NOT NULL,
+  waktu_analisis TIMESTAMP DEFAULT NOW()
+);
+
 
 
 

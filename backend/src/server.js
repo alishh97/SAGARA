@@ -16,6 +16,13 @@ app.use('/api/wadah', wadahRoutes);
 const chatRoutes = require('./routes/chat');
 app.use('/api/chat', chatRoutes);
 
+const path = require('path');
+const analisisFotoRoutes = require('./routes/analisisFoto');
+app.use('/api/analisis-foto', analisisFotoRoutes);
+
+// Menyajikan foto hasil unggahan agar bisa ditampilkan di frontend
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+
 // Endpoint uji untuk memastikan server dan database terhubung
 app.get('/api/health', async (req, res) => {
   try {

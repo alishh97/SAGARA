@@ -7,6 +7,7 @@ const JUMLAH_RIWAYAT_KONTEKS = 6; // jumlah pesan terakhir yang ikut dikirim seb
 
 const INSTRUKSI_SISTEM = `Kamu adalah asisten SAGARA untuk pemeliharaan dan breeding hewan air.
 Jawab dalam bahasa Indonesia yang mudah dipahami pengguna awam, singkat dan praktis.
+Jawab ringkas, maksimal sekitar 100 kata.
 Gunakan data wadah yang diberikan sebagai konteks, jangan meminta pengguna menjelaskan ulang.
 Jawabanmu bersifat edukasi awal, bukan diagnosis profesional. Untuk kasus serius seperti
 kematian massal atau penyakit menular, sarankan berkonsultasi dengan ahli perikanan.`;
@@ -76,7 +77,7 @@ ${pertanyaan}`;
 
 // UC-11 + UC-12: Bertanya kepada Chatbot AI
 async function kirimPesan(req, res) {
-  const { idWadah, pertanyaan } = req.body;
+    const { idWadah, pertanyaan, idAnalisis } = req.body;
 
   if (!pertanyaan || !pertanyaan.trim()) {
     return res.status(400).json({ pesan: 'Harap masukkan pertanyaan' });
@@ -95,7 +96,18 @@ async function kirimPesan(req, res) {
       return res.status(403).json({ pesan: 'Kuota chat hari ini sudah habis', terpakai, batas });
     }
 
-    const prompt = await susunPrompt(wadah, pertanyaan.trim());
+        let prompt = await susunPrompt(wadah, pertanyaan.trim());
+
+        // Hasil analisis foto hanya disertakan jika pengguna memilih "Tanyakan lebih lanjut ke chatbot"
+        if (idAnalisis) {
+            const analisis = await pool.query(
+                'SELECT hasil_analisis FROM analisis_foto WHERE id_analisis = $1 AND id_wadah = $2',
+                [idAnalisis, wadah.id_wadah]
+            );
+            if (analisis.rows[0]) {
+                prompt = `HASIL ANALISIS FOTO YANG DIPILIH PENGGUNA\n${analisis.rows[0].hasil_analisis}\n\n${prompt}`;
+            }
+        }
 
     let jawaban;
     try {
