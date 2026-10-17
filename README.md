@@ -2,9 +2,6 @@
 
 Aplikasi web asisten pemeliharaan dan breeding hewan air berbasis AI, dengan chatbot yang memahami konteks setiap wadah (akuarium atau kolam) dan analisis kondisi dari foto.
 
-Proyek mata kuliah Implementasi dan Perancangan Perangkat Lunak (IPPL).
-Alisha Zalfa Safitri (11241010)
-
 ## Latar Belakang
 
 Penghobi akuarium dan pembudidaya hewan air sering mengelola lebih dari satu wadah dengan kondisi berbeda. Saat bertanya ke AI umum, mereka harus menjelaskan ulang ukuran wadah, jenis hewan, dan parameter air setiap kali. SAGARA menyimpan profil setiap wadah sekali, lalu menyisipkannya otomatis sebagai konteks setiap kali pengguna bertanya atau mengunggah foto.
@@ -40,7 +37,7 @@ AI diterapkan dalam dua bentuk yang saling terhubung:
 
 ✅ selesai · ⏳ tahap pengembangan berikutnya
 
-**Progres prototipe: 11 dari 23 kebutuhan fungsional (±48%).**
+**Progres yg udah: 11 dari 23 kebutuhan fungsional.**
 
 ## Paket Freemium
 
@@ -132,7 +129,7 @@ Seluruh endpoint selain `/api/auth` memerlukan header `Authorization: Bearer <to
 
 - Software Requirements Specification (SRS)
 - Software Design Document (SDD)
-- Video pitching: _(tautan menyusul)_
+- Video pitching: ......
 
 ## Catatan
 
