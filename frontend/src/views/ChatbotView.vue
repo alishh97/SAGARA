@@ -84,7 +84,7 @@ async function kirim() {
 }
 
 // Jawaban AI bisa memuat tanda ** (markdown), dibersihkan agar mudah dibaca
-const bersihkan = (teks) => teks.replace(/\*\*/g, '').replace(/^\* /gm, '• ')
+const bersihkan = (teks) => teks.replace(/\*\*/g, '').replace(/^\s*\* /gm, '• ').replace(/\*/g, '')
 const jam = (w) => new Date(w).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
 </script>
 
