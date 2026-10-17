@@ -2,7 +2,7 @@ const pool = require('../config/db');
 const { kirimPromptChat } = require('../services/geminiAPIService');
 
 // Batas chat per hari (SRS Tabel 2.1). Akun premium nanti dibaca dari paket di tabel Langganan.
-const BATAS_CHAT_HARIAN = { GRATIS: 5, PREMIUM: 40 };
+const BATAS_CHAT_HARIAN = { GRATIS: 10, PREMIUM: 30 };
 const JUMLAH_RIWAYAT_KONTEKS = 6; // jumlah pesan terakhir yang ikut dikirim sebagai konteks
 
 const INSTRUKSI_SISTEM = `Kamu adalah asisten SAGARA untuk pemeliharaan dan breeding hewan air.

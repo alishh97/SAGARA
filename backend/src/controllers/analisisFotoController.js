@@ -4,7 +4,7 @@ const pool = require('../config/db');
 const { kirimPromptAnalisisFoto } = require('../services/geminiAPIService');
 
 // Batas analisis foto per bulan (SRS Tabel 2.1). Akun premium nanti dibaca dari paket di tabel Langganan.
-const BATAS_FOTO_BULANAN = { GRATIS: 2, PREMIUM: 60 };
+const BATAS_FOTO_BULANAN = { GRATIS: 5, PREMIUM: 30 };
 const FOLDER_UPLOAD = path.join(__dirname, '..', '..', 'uploads');
 const PENANDA_BUKAN_HEWAN_AIR = 'BUKAN_HEWAN_AIR';
 
