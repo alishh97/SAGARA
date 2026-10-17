@@ -1,8 +1,22 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import LoginView from '@/views/LoginView.vue'
+import RegistrasiView from '@/views/RegistrasiView.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [],
+  history: createWebHistory(),
+  routes: [
+    { path: '/login', component: LoginView, meta: { tamu: true } },
+    { path: '/registrasi', component: RegistrasiView, meta: { tamu: true } },
+    // Sementara: halaman utama diarahkan ke login sampai dashboard dibuat
+    { path: '/', redirect: '/login' },
+  ],
+})
+
+// Penjaga halaman: yang belum login hanya boleh membuka halaman tamu
+router.beforeEach((to) => {
+  const auth = useAuthStore()
+  if (!to.meta.tamu && !auth.sudahLogin) return '/login'
 })
 
 export default router
