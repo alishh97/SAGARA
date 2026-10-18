@@ -129,7 +129,7 @@ Seluruh endpoint selain `/api/auth` memerlukan header `Authorization: Bearer <to
 
 - Software Requirements Specification (SRS)
 - Software Design Document (SDD)
-- Video pitching: ......
+- Video pitching: https://youtu.be/3dhBqA59iYU
 
 ## Catatan
 
