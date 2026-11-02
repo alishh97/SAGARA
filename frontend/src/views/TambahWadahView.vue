@@ -1,10 +1,16 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter, RouterLink } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter, RouterLink } from 'vue-router'
 import AppLayout from '@/components/AppLayout.vue'
 import { api } from '@/services/api'
 
+const route = useRoute()
 const router = useRouter()
+
+// Halaman ini dipakai untuk tambah (UC-05) dan edit (UC-08). Mode edit jika URL punya id wadah.
+const idWadah = route.params.id
+const modeEdit = computed(() => Boolean(idWadah))
+const urlKembali = computed(() => (modeEdit.value ? `/wadah/${idWadah}` : '/'))
 
 const form = ref({
   namaWadah: '',
@@ -19,7 +25,28 @@ const form = ref({
 const pesanError = ref('')
 const menyimpan = ref(false)
 
-// UC-05: Menambah Wadah
+// UC-08 langkah awal: isi form dengan data wadah yang sekarang
+onMounted(async () => {
+  if (!modeEdit.value) return
+  try {
+    const data = await api.get(`/wadah/${idWadah}`)
+    const h = data.hewan[0] || {}
+    form.value = {
+      namaWadah: data.wadah.nama_wadah,
+      jenisWadah: data.wadah.jenis_wadah,
+      volume: data.wadah.volume,
+      jenisHewan: h.jenis_hewan || '',
+      jumlah: h.jumlah || '',
+      tujuan: h.tujuan || 'PEMELIHARAAN',
+      suhu: data.parameterAir?.suhu ?? '',
+      ph: data.parameterAir?.ph ?? '',
+    }
+  } catch (err) {
+    pesanError.value = err.pesan || 'Gagal memuat data wadah, silakan coba lagi nanti'
+  }
+})
+
+// UC-05: Menambah Wadah / UC-08: Mengedit Wadah
 async function simpan() {
   pesanError.value = ''
   const f = form.value
@@ -29,15 +56,21 @@ async function simpan() {
   }
   menyimpan.value = true
   try {
-    await api.post('/wadah', {
+    const isi = {
       namaWadah: f.namaWadah,
       jenisWadah: f.jenisWadah,
       volume: Number(f.volume),
       hewan: [{ jenisHewan: f.jenisHewan, jumlah: Number(f.jumlah), tujuan: f.tujuan }],
       suhu: f.suhu ? Number(f.suhu) : null,
       ph: f.ph ? Number(f.ph) : null,
-    })
-    router.push('/')
+    }
+    if (modeEdit.value) {
+      await api.put(`/wadah/${idWadah}`, isi)
+      router.push(`/wadah/${idWadah}`)
+    } else {
+      await api.post('/wadah', isi)
+      router.push('/')
+    }
   } catch (err) {
     pesanError.value = err.pesan || 'Wadah gagal disimpan, silakan coba lagi nanti'
   } finally {
@@ -52,8 +85,8 @@ const kelasPilihan = (aktif) =>
 
 <template>
   <AppLayout>
-    <RouterLink to="/" class="text-sm text-primary">← Kembali ke Wadah Saya</RouterLink>
-    <h1 class="mt-2 text-3xl font-bold">Tambah Wadah</h1>
+    <RouterLink :to="urlKembali" class="text-sm text-primary">← Kembali</RouterLink>
+    <h1 class="mt-2 text-3xl font-bold">{{ modeEdit ? 'Edit Wadah' : 'Tambah Wadah' }}</h1>
     <p class="mt-1 text-text-muted">Isi data sekali, AI akan mengingatnya</p>
 
     <form class="mt-6 max-w-3xl rounded-xl border border-border bg-white p-6 md:p-8" @submit.prevent="simpan">
@@ -111,7 +144,7 @@ const kelasPilihan = (aktif) =>
       <p v-if="pesanError" class="mt-6 rounded-lg bg-error/10 px-4 py-2 text-sm text-error">{{ pesanError }}</p>
 
       <div class="mt-8 flex justify-end gap-3">
-        <RouterLink to="/" class="rounded-lg border border-primary px-5 py-2.5 font-semibold text-primary">Batal</RouterLink>
+        <RouterLink :to="urlKembali" class="rounded-lg border border-primary px-5 py-2.5 font-semibold text-primary">Batal</RouterLink>
         <button type="submit" :disabled="menyimpan"
           class="rounded-lg bg-primary px-6 py-2.5 font-semibold text-white disabled:opacity-60">
           {{ menyimpan ? 'Menyimpan...' : 'Simpan' }}

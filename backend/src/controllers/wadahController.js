@@ -140,4 +140,76 @@ async function lihatDetailWadah(req, res) {
   }
 }
 
-module.exports = { cekKuotaWadah, tambahWadah, lihatDaftarWadah, lihatDetailWadah };
+// UC-08: Mengedit Wadah (data wadah + hewan diganti, parameter air dicatat sebagai catatan baru)
+async function editWadah(req, res) {
+  const { namaWadah, jenisWadah, volume, hewan, suhu, ph } = req.body;
+
+  if (!namaWadah || !jenisWadah || !volume || !Array.isArray(hewan) || hewan.length === 0) {
+    return res.status(400).json({ pesan: 'Harap isi kolom ini' });
+  }
+  if (!JENIS_WADAH.includes(jenisWadah)) {
+    return res.status(400).json({ pesan: 'Jenis wadah harus Akuarium atau Kolam' });
+  }
+  for (const h of hewan) {
+    if (!h.jenisHewan || !h.jumlah || !TUJUAN.includes(h.tujuan)) {
+      return res.status(400).json({ pesan: 'Data hewan belum lengkap atau tidak valid' });
+    }
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // Hanya pemilik wadah yang boleh mengedit
+    const hasil = await client.query(
+      `UPDATE wadah SET nama_wadah = $1, jenis_wadah = $2, volume = $3
+       WHERE id_wadah = $4 AND id_pengguna = $5 RETURNING *`,
+      [namaWadah, jenisWadah, volume, req.params.id, req.idPengguna]
+    );
+    if (hasil.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ pesan: 'Wadah tidak ditemukan' });
+    }
+
+    await client.query('DELETE FROM hewan_wadah WHERE id_wadah = $1', [req.params.id]);
+    for (const h of hewan) {
+      await client.query(
+        'INSERT INTO hewan_wadah (id_wadah, jenis_hewan, jumlah, tujuan) VALUES ($1, $2, $3, $4)',
+        [req.params.id, h.jenisHewan, h.jumlah, h.tujuan]
+      );
+    }
+
+    if (suhu || ph) {
+      await client.query(
+        'INSERT INTO parameter_air (id_wadah, suhu, ph) VALUES ($1, $2, $3)',
+        [req.params.id, suhu || null, ph || null]
+      );
+    }
+
+    await client.query('COMMIT');
+    res.json({ pesan: 'Perubahan wadah berhasil disimpan', wadah: hasil.rows[0] });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    res.status(500).json({ pesan: 'Perubahan gagal disimpan, silakan coba lagi nanti' });
+  } finally {
+    client.release();
+  }
+}
+
+// UC-09: Menghapus Wadah (hewan, parameter air, chat, dan analisis foto ikut terhapus lewat ON DELETE CASCADE)
+async function hapusWadah(req, res) {
+  try {
+    const hasil = await pool.query(
+      'DELETE FROM wadah WHERE id_wadah = $1 AND id_pengguna = $2 RETURNING id_wadah',
+      [req.params.id, req.idPengguna]
+    );
+    if (hasil.rows.length === 0) {
+      return res.status(404).json({ pesan: 'Wadah tidak ditemukan' });
+    }
+    res.json({ pesan: 'Wadah berhasil dihapus' });
+  } catch (err) {
+    res.status(500).json({ pesan: 'Wadah gagal dihapus, silakan coba lagi nanti' });
+  }
+}
+
+module.exports = { cekKuotaWadah, tambahWadah, lihatDaftarWadah, lihatDetailWadah, editWadah, hapusWadah };

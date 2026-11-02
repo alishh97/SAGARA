@@ -34,4 +34,6 @@ async function permintaan(url, opsi = {}) {
 export const api = {
   get: (url) => permintaan(url),
   post: (url, body) => permintaan(url, { method: 'POST', body }),
+  put: (url, body) => permintaan(url, { method: 'PUT', body }),
+  delete: (url) => permintaan(url, { method: 'DELETE' }),
 }

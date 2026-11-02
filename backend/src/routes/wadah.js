@@ -5,6 +5,8 @@ const {
   tambahWadah,
   lihatDaftarWadah,
   lihatDetailWadah,
+  editWadah,
+  hapusWadah,
 } = require('../controllers/wadahController');
 
 const router = express.Router();
@@ -16,5 +18,7 @@ router.get('/kuota', cekKuotaWadah);
 router.get('/', lihatDaftarWadah);
 router.get('/:id', lihatDetailWadah);
 router.post('/', tambahWadah);
+router.put('/:id', editWadah);
+router.delete('/:id', hapusWadah);
 
 module.exports = router;

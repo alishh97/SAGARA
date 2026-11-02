@@ -17,8 +17,11 @@ const router = createRouter({
     { path: '/', component: DashboardView },
     { path: '/wadah/tambah', component: TambahWadahView },
     { path: '/wadah/:id', component: DetailWadahView },
+    { path: '/wadah/:id/edit', component: TambahWadahView },
     { path: '/chatbot', component: ChatbotView },
     { path: '/analisis-foto', component: AnalisisFotoView },
+    // URL yang tidak dikenal diarahkan ke halaman utama (lalu ke login jika belum login)
+    { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 })
 

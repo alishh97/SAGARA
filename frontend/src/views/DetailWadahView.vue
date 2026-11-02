@@ -11,6 +11,9 @@ const wadahStore = useWadahStore()
 
 const data = ref(null)
 const pesanError = ref('')
+const konfirmasiHapus = ref(false)
+const menghapus = ref(false)
+const pesanErrorHapus = ref('')
 
 // UC-07: Melihat Detail Wadah
 onMounted(async () => {
@@ -25,6 +28,26 @@ onMounted(async () => {
 function bukaDenganWadahAktif(tujuan) {
   wadahStore.pilihWadahAktif(data.value.wadah.id_wadah)
   router.push(tujuan)
+}
+
+// UC-09: Menghapus Wadah (setelah pengguna mengonfirmasi)
+async function hapusWadah() {
+  menghapus.value = true
+  pesanErrorHapus.value = ''
+  try {
+    const id = data.value.wadah.id_wadah
+    await api.delete(`/wadah/${id}`)
+    // Jika wadah yang dihapus adalah wadah aktif, kosongkan pilihan wadah aktif
+    if (wadahStore.idWadahAktif === id) {
+      wadahStore.idWadahAktif = null
+      localStorage.removeItem('idWadahAktif')
+    }
+    router.push('/')
+  } catch (err) {
+    pesanErrorHapus.value = err.pesan || 'Wadah gagal dihapus, silakan coba lagi nanti'
+  } finally {
+    menghapus.value = false
+  }
 }
 
 const formatTujuan = (t) => (t === 'BREEDING' ? 'Breeding' : 'Pemeliharaan')
@@ -49,8 +72,14 @@ const formatAngka = (n) => (n == null ? '-' : Number(n).toLocaleString('id-ID', 
           </div>
           <p v-if="data.hewan[0]" class="mt-1 text-text-muted">Tujuan: {{ formatTujuan(data.hewan[0].tujuan) }}</p>
         </div>
-        <button class="rounded-lg bg-primary px-5 py-2.5 font-semibold text-white"
-          @click="bukaDenganWadahAktif('/chatbot')">Chat</button>
+        <div class="flex gap-2">
+          <RouterLink :to="`/wadah/${data.wadah.id_wadah}/edit`"
+            class="rounded-lg border border-primary px-5 py-2.5 font-semibold text-primary">Edit</RouterLink>
+          <button class="rounded-lg border border-error px-5 py-2.5 font-semibold text-error"
+            @click="konfirmasiHapus = true">Hapus</button>
+          <button class="rounded-lg bg-primary px-5 py-2.5 font-semibold text-white"
+            @click="bukaDenganWadahAktif('/chatbot')">Chat</button>
+        </div>
       </div>
 
       <div class="mt-6 grid gap-5 lg:grid-cols-2">
@@ -110,5 +139,22 @@ const formatAngka = (n) => (n == null ? '-' : Number(n).toLocaleString('id-ID', 
         </div>
       </div>
     </template>
+
+    <!-- Dialog konfirmasi hapus wadah (UC-09) -->
+    <div v-if="konfirmasiHapus" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div class="w-full max-w-md rounded-xl bg-white p-6">
+        <h2 class="text-lg font-semibold">Hapus wadah "{{ data.wadah.nama_wadah }}"?</h2>
+        <p class="mt-2 text-text-muted">
+          Data hewan, parameter air, riwayat chat, dan analisis foto wadah ini juga akan terhapus dan tidak bisa dikembalikan.
+        </p>
+        <p v-if="pesanErrorHapus" class="mt-4 rounded-lg bg-error/10 px-4 py-2 text-sm text-error">{{ pesanErrorHapus }}</p>
+        <div class="mt-6 flex justify-end gap-3">
+          <button class="rounded-lg border border-border px-5 py-2.5 font-semibold" :disabled="menghapus"
+            @click="konfirmasiHapus = false">Batal</button>
+          <button class="rounded-lg bg-error px-5 py-2.5 font-semibold text-white disabled:opacity-60" :disabled="menghapus"
+            @click="hapusWadah">{{ menghapus ? 'Menghapus...' : 'Ya, hapus' }}</button>
+        </div>
+      </div>
+    </div>
   </AppLayout>
 </template>

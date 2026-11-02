@@ -6,7 +6,9 @@ const FORMAT_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // UC-01: Registrasi Akun
 async function registrasi(req, res) {
-  const { nama, email, kataSandi } = req.body;
+  const { nama, kataSandi } = req.body;
+  // Email disimpan huruf kecil supaya GIP@GMAIL.COM dan gip@gmail.com dianggap sama (TC-006)
+  const email = (req.body.email || '').trim().toLowerCase();
 
   if (!nama || !email || !kataSandi) {
     return res.status(400).json({ pesan: 'Harap isi kolom ini' });
@@ -37,7 +39,8 @@ async function registrasi(req, res) {
 
 // UC-02: Login
 async function login(req, res) {
-  const { email, kataSandi } = req.body;
+  const { kataSandi } = req.body;
+  const email = (req.body.email || '').trim().toLowerCase();
 
   if (!email || !kataSandi) {
     return res.status(400).json({ pesan: 'Harap isi kolom ini' });
