@@ -165,4 +165,28 @@ async function hapusRiwayatChat(req, res) {
   }
 }
 
-module.exports = { kirimPesan, lihatRiwayatChat, hapusRiwayatChat };
+// UC-15: Ringkasan riwayat semua wadah milik pengguna (untuk daftar di halaman Riwayat)
+async function ringkasanRiwayat(req, res) {
+  try {
+    const hasil = await pool.query(
+      `SELECT w.id_wadah, w.nama_wadah, w.jenis_wadah,
+              (SELECT COUNT(*) FROM pesan_chat p WHERE p.id_wadah = w.id_wadah) AS jumlah_pesan,
+              (SELECT COUNT(*) FROM analisis_foto a WHERE a.id_wadah = w.id_wadah) AS jumlah_foto,
+              (SELECT p.isi_pesan FROM pesan_chat p WHERE p.id_wadah = w.id_wadah AND p.pengirim = 'PENGGUNA'
+                 ORDER BY p.waktu_kirim DESC, p.id_pesan DESC LIMIT 1) AS pertanyaan_terakhir,
+              GREATEST(
+                (SELECT MAX(p.waktu_kirim) FROM pesan_chat p WHERE p.id_wadah = w.id_wadah),
+                (SELECT MAX(a.waktu_analisis) FROM analisis_foto a WHERE a.id_wadah = w.id_wadah)
+              ) AS aktivitas_terakhir
+       FROM wadah w
+       WHERE w.id_pengguna = $1
+       ORDER BY aktivitas_terakhir DESC NULLS LAST, w.tanggal_dibuat DESC`,
+      [req.idPengguna]
+    );
+    res.json({ riwayat: hasil.rows });
+  } catch (err) {
+    res.status(500).json({ pesan: 'Gagal memuat riwayat, silakan coba lagi nanti' });
+  }
+}
+
+module.exports = { kirimPesan, lihatRiwayatChat, hapusRiwayatChat, ringkasanRiwayat };

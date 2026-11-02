@@ -8,6 +8,7 @@ import DetailWadahView from '@/views/DetailWadahView.vue'
 import ChatbotView from '@/views/ChatbotView.vue'
 import AnalisisFotoView from '@/views/AnalisisFotoView.vue'
 import RiwayatView from '@/views/RiwayatView.vue'
+import RiwayatDetailView from '@/views/RiwayatDetailView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -22,6 +23,7 @@ const router = createRouter({
     { path: '/chatbot', component: ChatbotView },
     { path: '/analisis-foto', component: AnalisisFotoView },
     { path: '/riwayat', component: RiwayatView },
+    { path: '/riwayat/:idWadah', component: RiwayatDetailView },
     // URL yang tidak dikenal diarahkan ke halaman utama (lalu ke login jika belum login)
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
