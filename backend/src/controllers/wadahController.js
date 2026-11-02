@@ -4,7 +4,7 @@ const JENIS_WADAH = ['AKUARIUM', 'KOLAM'];
 const TUJUAN = ['PEMELIHARAAN', 'BREEDING'];
 
 // Batas wadah per jenis akun (SRS Tabel 2.1). Akun premium nanti dibaca dari paket di tabel Langganan.
-const BATAS_WADAH = { GRATIS: 2, PREMIUM: 20 };
+const BATAS_WADAH = { GRATIS: 3, PREMIUM: 20 };
 
 // bolehTambahWadah(): memeriksa jumlah wadah terhadap batas akun
 async function periksaKuotaWadah(idPengguna) {

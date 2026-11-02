@@ -4,6 +4,11 @@ const pool = require('../config/db');
 
 const FORMAT_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Aturan kata sandi: minimal 8 karakter, mengandung huruf dan angka (simbol boleh)
+function kataSandiValid(k) {
+  return k.length >= 8 && /[A-Za-z]/.test(k) && /[0-9]/.test(k);
+}
+
 // UC-01: Registrasi Akun
 async function registrasi(req, res) {
   const { nama, kataSandi } = req.body;
@@ -15,6 +20,9 @@ async function registrasi(req, res) {
   }
   if (!FORMAT_EMAIL.test(email)) {
     return res.status(400).json({ pesan: 'Format email tidak valid' });
+  }
+  if (!kataSandiValid(kataSandi)) {
+    return res.status(400).json({ pesan: 'Kata sandi minimal 8 karakter dan harus mengandung huruf dan angka' });
   }
 
   try {

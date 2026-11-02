@@ -151,4 +151,18 @@ async function lihatRiwayatChat(req, res) {
   }
 }
 
-module.exports = { kirimPesan, lihatRiwayatChat };
+// UC-16: Menghapus Riwayat Chat satu wadah
+async function hapusRiwayatChat(req, res) {
+  try {
+    const wadah = await ambilWadahMilikPengguna(req.params.idWadah, req.idPengguna);
+    if (!wadah) {
+      return res.status(404).json({ pesan: 'Wadah tidak ditemukan' });
+    }
+    await pool.query('DELETE FROM pesan_chat WHERE id_wadah = $1', [wadah.id_wadah]);
+    res.json({ pesan: 'Riwayat chat berhasil dihapus' });
+  } catch (err) {
+    res.status(500).json({ pesan: 'Riwayat gagal dihapus, silakan coba lagi nanti' });
+  }
+}
+
+module.exports = { kirimPesan, lihatRiwayatChat, hapusRiwayatChat };

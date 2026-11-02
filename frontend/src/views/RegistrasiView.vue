@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
@@ -11,6 +11,15 @@ const email = ref('')
 const kataSandi = ref('')
 const pesanError = ref('')
 const memuat = ref(false)
+const tampilkanSandi = ref(false)
+
+// Aturan kata sandi ditampilkan langsung di bawah kolom supaya pengguna tahu syaratnya sejak awal
+const syaratSandi = computed(() => [
+  { teks: 'Minimal 8 karakter', ok: kataSandi.value.length >= 8 },
+  { teks: 'Mengandung huruf', ok: /[A-Za-z]/.test(kataSandi.value) },
+  { teks: 'Mengandung angka', ok: /[0-9]/.test(kataSandi.value) },
+])
+const sandiValid = computed(() => syaratSandi.value.every((s) => s.ok))
 
 // UC-01: Registrasi Akun
 async function daftar() {
@@ -21,6 +30,10 @@ async function daftar() {
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
     pesanError.value = 'Format email tidak valid'
+    return
+  }
+  if (!sandiValid.value) {
+    pesanError.value = 'Kata sandi belum memenuhi syarat'
     return
   }
   memuat.value = true
@@ -63,8 +76,17 @@ async function daftar() {
           class="mt-2 w-full rounded-lg border border-border bg-white px-4 py-3 outline-none focus:border-primary" />
 
         <label class="mt-5 block text-sm font-semibold">Kata sandi</label>
-        <input v-model="kataSandi" type="password" placeholder="Buat kata sandi"
-          class="mt-2 w-full rounded-lg border border-border bg-white px-4 py-3 outline-none focus:border-primary" />
+        <div class="relative mt-2">
+          <input v-model="kataSandi" :type="tampilkanSandi ? 'text' : 'password'" placeholder="Buat kata sandi"
+            class="w-full rounded-lg border border-border bg-white px-4 py-3 pr-20 outline-none focus:border-primary" />
+          <button type="button" class="absolute inset-y-0 right-3 text-sm font-semibold text-primary"
+            @click="tampilkanSandi = !tampilkanSandi">{{ tampilkanSandi ? 'Sembunyi' : 'Lihat' }}</button>
+        </div>
+        <ul class="mt-2 space-y-1 text-sm">
+          <li v-for="s in syaratSandi" :key="s.teks" :class="s.ok ? 'text-primary' : 'text-text-muted'">
+            {{ s.ok ? '✓' : '•' }} {{ s.teks }}
+          </li>
+        </ul>
 
         <p v-if="pesanError" class="mt-4 rounded-lg bg-error/10 px-4 py-2 text-sm text-error">{{ pesanError }}</p>
 

@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const verifikasiToken = require('../middleware/auth');
-const { unggahFoto, lihatRiwayatAnalisis } = require('../controllers/analisisFotoController');
+const { unggahFoto, lihatRiwayatAnalisis, hapusRiwayatAnalisis } = require('../controllers/analisisFotoController');
 
 const router = express.Router();
 
@@ -28,5 +28,6 @@ router.use(verifikasiToken);
 
 router.post('/', terimaFoto, unggahFoto);
 router.get('/:idWadah', lihatRiwayatAnalisis);
+router.delete('/item/:idAnalisis', hapusRiwayatAnalisis);
 
 module.exports = router;

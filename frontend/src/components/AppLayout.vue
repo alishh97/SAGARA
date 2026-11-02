@@ -9,9 +9,10 @@ const menu = [
   { label: 'Wadah Saya', to: '/' },
   { label: 'Chatbot', to: '/chatbot' },
   { label: 'Analisis Foto', to: '/analisis-foto' },
+  { label: 'Riwayat', to: '/riwayat' },
 ]
 // Fitur di luar cakupan UTS, ditampilkan sebagai rencana pengembangan
-const menuSegera = ['Riwayat', 'Langganan']
+const menuSegera = ['Langganan']
 
 // UC-03: Logout
 function keluar() {

@@ -133,4 +133,26 @@ async function lihatRiwayatAnalisis(req, res) {
   }
 }
 
-module.exports = { unggahFoto, lihatRiwayatAnalisis };
+// UC-16: Menghapus satu riwayat analisis foto (data dan file fotonya)
+async function hapusRiwayatAnalisis(req, res) {
+  try {
+    // Pastikan analisis ini milik wadah pengguna yang sedang login
+    const hasil = await pool.query(
+      `DELETE FROM analisis_foto a USING wadah w
+       WHERE a.id_wadah = w.id_wadah AND a.id_analisis = $1 AND w.id_pengguna = $2
+       RETURNING a.path_foto`,
+      [req.params.idAnalisis, req.idPengguna]
+    );
+    if (hasil.rows.length === 0) {
+      return res.status(404).json({ pesan: 'Riwayat analisis tidak ditemukan' });
+    }
+    // File foto ikut dihapus; jika file sudah tidak ada, abaikan
+    const namaFile = path.basename(hasil.rows[0].path_foto);
+    fs.unlink(path.join(FOLDER_UPLOAD, namaFile), () => {});
+    res.json({ pesan: 'Riwayat analisis berhasil dihapus' });
+  } catch (err) {
+    res.status(500).json({ pesan: 'Riwayat gagal dihapus, silakan coba lagi nanti' });
+  }
+}
+
+module.exports = { unggahFoto, lihatRiwayatAnalisis, hapusRiwayatAnalisis };
