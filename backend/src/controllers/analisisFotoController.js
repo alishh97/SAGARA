@@ -3,8 +3,8 @@ const path = require('path');
 const pool = require('../config/db');
 const { kirimPromptAnalisisFoto } = require('../services/geminiAPIService');
 
-// Batas analisis foto per bulan (SRS Tabel 2.1). Akun premium nanti dibaca dari paket di tabel Langganan.
-const BATAS_FOTO_BULANAN = { GRATIS: 5, PREMIUM: 30 };
+// Batas analisis foto per hari (SRS Tabel 2.1). Akun premium nanti dibaca dari paket di tabel Langganan.
+const BATAS_FOTO_HARIAN = { GRATIS: 5, PREMIUM: 30 };
 const FOLDER_UPLOAD = path.join(__dirname, '..', '..', 'uploads');
 const PENANDA_BUKAN_HEWAN_AIR = 'BUKAN_HEWAN_AIR';
 
@@ -32,12 +32,12 @@ async function catatLog(idPengguna, status) {
   );
 }
 
-// hitungPenggunaan(ANALISIS_FOTO, bulanIni)
-async function hitungFotoBulanIni(idPengguna) {
+// hitungPenggunaan(ANALISIS_FOTO, hariIni)
+async function hitungFotoHariIni(idPengguna) {
   const hasil = await pool.query(
     `SELECT COUNT(*) FROM log_penggunaan_ai
      WHERE id_pengguna = $1 AND jenis_layanan = 'ANALISIS_FOTO' AND status = 'BERHASIL'
-       AND date_trunc('month', waktu) = date_trunc('month', NOW())`,
+       AND waktu::date = CURRENT_DATE`,
     [idPengguna]
   );
   return Number(hasil.rows[0].count);
@@ -66,10 +66,10 @@ async function unggahFoto(req, res) {
     }
 
     const akun = await pool.query('SELECT status_akun FROM pengguna WHERE id_pengguna = $1', [req.idPengguna]);
-    const batas = BATAS_FOTO_BULANAN[akun.rows[0].status_akun];
-    const terpakai = await hitungFotoBulanIni(req.idPengguna);
+    const batas = BATAS_FOTO_HARIAN[akun.rows[0].status_akun];
+    const terpakai = await hitungFotoHariIni(req.idPengguna);
     if (terpakai >= batas) {
-      return res.status(403).json({ pesan: 'Kuota analisis foto bulan ini sudah habis', terpakai, batas });
+      return res.status(403).json({ pesan: 'Kuota analisis foto hari ini sudah habis', terpakai, batas });
     }
 
     // Konteks wadah untuk prompt (tanpa data pribadi pengguna, NFR-13)

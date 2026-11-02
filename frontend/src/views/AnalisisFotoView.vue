@@ -130,7 +130,7 @@ const bersihkan = (teks) => teks.replace(/\*\*/g, '').replace(/^\s*\* /gm, '• 
             <li>Fokus pada ikan atau bagian yang bermasalah</li>
             <li>Hindari pantulan cahaya di kaca</li>
           </ul>
-          <p v-if="sisaKuota !== null" class="mt-3 text-sm text-text-muted">Sisa analisis foto bulan ini: {{ sisaKuota }}</p>
+          <p v-if="sisaKuota !== null" class="mt-3 text-sm text-text-muted">Sisa analisis foto hari ini: {{ sisaKuota }}</p>
         </div>
       </div>
 
