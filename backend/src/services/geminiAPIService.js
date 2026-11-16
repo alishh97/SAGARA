@@ -13,7 +13,12 @@ function denganBatasWaktu(promise) {
   ]);
 }
 
-// kirimPromptChat(prompt): String
+// Ambil teks jawaban dan jumlah token yang terpakai (untuk statistik admin)
+function ambilHasil(respons) {
+  return { teks: respons.text, jumlahToken: respons.usageMetadata?.totalTokenCount || 0 };
+}
+
+// kirimPromptChat(prompt): { teks, jumlahToken }
 async function kirimPromptChat(instruksiSistem, prompt) {
   const respons = await denganBatasWaktu(
     ai.models.generateContent({
@@ -22,10 +27,10 @@ async function kirimPromptChat(instruksiSistem, prompt) {
       config: { systemInstruction: instruksiSistem },
     })
   );
-  return respons.text;
+  return ambilHasil(respons);
 }
 
-// kirimPromptAnalisisFoto(prompt, foto): String
+// kirimPromptAnalisisFoto(prompt, foto): { teks, jumlahToken }
 async function kirimPromptAnalisisFoto(instruksiSistem, prompt, fotoBase64, mimeType) {
   const respons = await denganBatasWaktu(
     ai.models.generateContent({
@@ -34,7 +39,7 @@ async function kirimPromptAnalisisFoto(instruksiSistem, prompt, fotoBase64, mime
       config: { systemInstruction: instruksiSistem },
     })
   );
-  return respons.text;
+  return ambilHasil(respons);
 }
 
 module.exports = { kirimPromptChat, kirimPromptAnalisisFoto };

@@ -92,6 +92,16 @@ const bersihkan = (teks) => teks.replace(/\*\*/g, '').replace(/^\s*\* /gm, '• 
       </label>
     </div>
 
+    <!-- Keterangan di awal: hasil analisis hanya edukasi awal (UC-13 langkah 1) -->
+    <div class="mt-6 rounded-xl border border-border bg-accent-soft/60 px-5 py-4">
+      <p class="font-semibold">Hasil analisis bersifat edukasi awal</p>
+      <p class="mt-1 text-sm text-text-muted">
+        Analisis foto membantu mengenali indikasi kondisi hewan dan air, tetapi bukan diagnosis profesional.
+        Untuk kasus serius seperti kematian massal atau dugaan penyakit menular, konsultasikan dengan ahli perikanan
+        atau dokter hewan akuatik.
+      </p>
+    </div>
+
     <div v-if="!wadahStore.daftar.length" class="mt-6 rounded-xl border border-dashed border-border bg-white p-10 text-center">
       <p class="font-semibold">Belum ada wadah</p>
       <p class="mt-1 text-text-muted">Tambahkan wadah dulu sebelum menganalisis foto.</p>

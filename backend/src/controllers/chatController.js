@@ -32,10 +32,11 @@ async function hitungChatHariIni(idPengguna) {
   return Number(hasil.rows[0].count);
 }
 
-async function catatLog(idPengguna, status) {
+// Mencatat setiap pemanggilan AI beserta jumlah token yang terpakai (statistik admin)
+async function catatLog(idPengguna, status, jumlahToken = 0) {
   await pool.query(
-    "INSERT INTO log_penggunaan_ai (id_pengguna, jenis_layanan, status) VALUES ($1, 'CHATBOT', $2)",
-    [idPengguna, status]
+    "INSERT INTO log_penggunaan_ai (id_pengguna, jenis_layanan, status, jumlah_token) VALUES ($1, 'CHATBOT', $2, $3)",
+    [idPengguna, status, jumlahToken]
   );
 }
 
@@ -110,8 +111,9 @@ async function kirimPesan(req, res) {
         }
 
     let jawaban;
+    let jumlahToken = 0;
     try {
-      jawaban = await kirimPromptChat(INSTRUKSI_SISTEM, prompt);
+      ({ teks: jawaban, jumlahToken } = await kirimPromptChat(INSTRUKSI_SISTEM, prompt));
     } catch (errAI) {
       // Gagal: catat log GAGAL, pertanyaan tidak disimpan, kuota tidak berkurang (UC-11 & UC-12)
       console.error('Gemini gagal:', errAI.message);
@@ -119,7 +121,7 @@ async function kirimPesan(req, res) {
       return res.status(503).json({ pesan: 'Layanan konsultasi sementara tidak tersedia, silakan coba lagi nanti' });
     }
 
-    await catatLog(req.idPengguna, 'BERHASIL');
+    await catatLog(req.idPengguna, 'BERHASIL', jumlahToken);
 
     // simpanJawabanAI(): simpan pertanyaan dan jawaban sebagai riwayat chat wadah
     await pool.query(

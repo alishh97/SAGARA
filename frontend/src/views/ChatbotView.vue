@@ -18,6 +18,8 @@ const sisaKuota = ref(null)
 const areaChat = ref(null)
 // Hasil analisis foto yang dibawa dari tombol "Tanyakan lebih lanjut ke chatbot"
 const idAnalisis = ref(route.query.idAnalisis || null)
+const analisisDipilih = ref(null) // data hasil analisis yang ditampilkan di atas chat
+const analisisTerbuka = ref(false)
 
 onMounted(async () => {
   try {
@@ -37,11 +39,18 @@ async function muatWadahAktif() {
   pesanError.value = ''
   detail.value = await api.get(`/wadah/${id}`)
   pesan.value = (await api.get(`/chat/${id}`)).pesan
+  // Alternative flow UC-11: tampilkan hasil analisis foto yang dibawa di atas jendela chat
+  analisisDipilih.value = null
+  if (idAnalisis.value) {
+    const riwayatFoto = (await api.get(`/analisis-foto/${id}`)).analisis
+    analisisDipilih.value = riwayatFoto.find((a) => a.id_analisis === Number(idAnalisis.value)) || null
+  }
   gulirKeBawah()
 }
 
 function gantiWadah(e) {
   idAnalisis.value = null
+  analisisDipilih.value = null
   router.replace({ query: {} })
   wadahStore.pilihWadahAktif(Number(e.target.value))
 }
@@ -115,9 +124,23 @@ const jam = (w) => new Date(w).toLocaleTimeString('id-ID', { hour: '2-digit', mi
         <p class="border-b border-border bg-accent-soft/60 px-5 py-2 text-xs text-text-muted">
           Jawaban chatbot bersifat edukasi awal, bukan diagnosis profesional.
         </p>
-        <p v-if="idAnalisis" class="border-b border-border bg-primary-light/40 px-5 py-2 text-sm">
-          Membahas hasil analisis foto sebagai konteks tambahan
-        </p>
+        <!-- Kartu hasil analisis foto yang sedang dibahas -->
+        <div v-if="analisisDipilih" class="flex gap-4 border-b border-border bg-primary-light/30 px-5 py-4">
+          <img :src="analisisDipilih.path_foto" alt="Foto yang dianalisis"
+            class="h-20 w-20 shrink-0 rounded-lg bg-white object-cover" />
+          <div class="min-w-0 flex-1 text-sm">
+            <p class="font-semibold">Hasil analisis foto yang sedang dibahas</p>
+            <p class="text-xs text-text-muted">
+              {{ new Date(analisisDipilih.waktu_analisis).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) }}
+            </p>
+            <p :class="['mt-1 whitespace-pre-line', analisisTerbuka ? '' : 'line-clamp-3']">
+              {{ bersihkan(analisisDipilih.hasil_analisis) }}
+            </p>
+            <button class="mt-1 font-semibold text-primary" @click="analisisTerbuka = !analisisTerbuka">
+              {{ analisisTerbuka ? 'Tutup' : 'Lihat selengkapnya' }}
+            </button>
+          </div>
+        </div>
 
         <div ref="areaChat" class="flex-1 space-y-4 overflow-y-auto p-5">
           <div class="max-w-[85%] rounded-xl border border-border bg-bg px-4 py-3">

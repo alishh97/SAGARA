@@ -33,5 +33,10 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+// Pembaruan struktur database yang sudah berjalan (schema.sql hanya dijalankan saat database pertama kali dibuat)
+pool
+  .query('ALTER TABLE log_penggunaan_ai ADD COLUMN IF NOT EXISTS jumlah_token INT NOT NULL DEFAULT 0')
+  .catch((err) => console.error('Gagal memperbarui tabel log_penggunaan_ai:', err.message));
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server SAGARA berjalan di port ${PORT}`));

@@ -25,10 +25,11 @@ function deteksiFormat(buffer) {
   return null;
 }
 
-async function catatLog(idPengguna, status) {
+// Mencatat setiap pemanggilan AI beserta jumlah token yang terpakai (statistik admin)
+async function catatLog(idPengguna, status, jumlahToken = 0) {
   await pool.query(
-    "INSERT INTO log_penggunaan_ai (id_pengguna, jenis_layanan, status) VALUES ($1, 'ANALISIS_FOTO', $2)",
-    [idPengguna, status]
+    "INSERT INTO log_penggunaan_ai (id_pengguna, jenis_layanan, status, jumlah_token) VALUES ($1, 'ANALISIS_FOTO', $2, $3)",
+    [idPengguna, status, jumlahToken]
   );
 }
 
@@ -80,8 +81,9 @@ Hewan yang dipelihara: ${daftarHewan || '-'}.
 Identifikasi indikasi kondisi kesehatan hewan dan kondisi air pada foto ini.`;
 
     let hasil;
+    let jumlahToken = 0;
     try {
-      hasil = await kirimPromptAnalisisFoto(INSTRUKSI_SISTEM, prompt, req.file.buffer.toString('base64'), format.mime);
+      ({ teks: hasil, jumlahToken } = await kirimPromptAnalisisFoto(INSTRUKSI_SISTEM, prompt, req.file.buffer.toString('base64'), format.mime));
     } catch (errAI) {
       // Gagal: foto dan hasil tidak disimpan, kuota tidak berkurang (UC-13 & UC-14)
       console.error('Gemini gagal:', errAI.message);
@@ -89,7 +91,7 @@ Identifikasi indikasi kondisi kesehatan hewan dan kondisi air pada foto ini.`;
       return res.status(503).json({ pesan: 'Layanan analisis sementara tidak tersedia, silakan coba lagi nanti' });
     }
 
-    await catatLog(req.idPengguna, 'BERHASIL');
+    await catatLog(req.idPengguna, 'BERHASIL', jumlahToken);
 
     // Foto bukan hewan air/wadah: tidak disimpan, tetap dihitung kuota (UC-14)
     if (hasil.trim().startsWith(PENANDA_BUKAN_HEWAN_AIR)) {

@@ -49,6 +49,7 @@ CREATE TABLE log_penggunaan_ai (
   id_pengguna INT NOT NULL REFERENCES pengguna(id_pengguna) ON DELETE CASCADE,
   jenis_layanan VARCHAR(15) NOT NULL CHECK (jenis_layanan IN ('CHATBOT', 'ANALISIS_FOTO')),
   status VARCHAR(20) NOT NULL,
+  jumlah_token INT NOT NULL DEFAULT 0,
   waktu TIMESTAMP DEFAULT NOW()
 );
 
