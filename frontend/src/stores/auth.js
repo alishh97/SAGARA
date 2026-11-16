@@ -30,5 +30,11 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('idWadahAktif')
   }
 
-  return { token, pengguna, sudahLogin, registrasi, login, logout }
+  // UC-19: setelah data akun diubah, perbarui nama/email yang tampil di aplikasi
+  function perbaruiPengguna(dataBaru) {
+    pengguna.value = dataBaru
+    localStorage.setItem('pengguna', JSON.stringify(dataBaru))
+  }
+
+  return { token, pengguna, sudahLogin, registrasi, login, logout, perbaruiPengguna }
 })

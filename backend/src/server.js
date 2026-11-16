@@ -16,6 +16,9 @@ app.use('/api/wadah', wadahRoutes);
 const chatRoutes = require('./routes/chat');
 app.use('/api/chat', chatRoutes);
 
+const akunRoutes = require('./routes/akun');
+app.use('/api/akun', akunRoutes);
+
 const adminRoutes = require('./routes/admin');
 app.use('/api/admin', adminRoutes);
 

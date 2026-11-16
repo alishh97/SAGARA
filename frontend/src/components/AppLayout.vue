@@ -10,6 +10,7 @@ const menu = [
   { label: 'Chatbot', to: '/chatbot' },
   { label: 'Analisis Foto', to: '/analisis-foto' },
   { label: 'Riwayat', to: '/riwayat' },
+  { label: 'Profil', to: '/profil' },
 ]
 // Fitur di luar cakupan UTS, ditampilkan sebagai rencana pengembangan
 const menuSegera = ['Langganan']
@@ -37,7 +38,9 @@ function keluar() {
         </span>
       </nav>
       <div class="mt-auto border-t border-border pt-4">
-        <p class="px-4 py-2 text-sm text-text-muted">{{ auth.pengguna?.nama }}</p>
+        <RouterLink to="/profil" class="block px-4 py-2 text-sm text-text-muted hover:text-primary">
+          {{ auth.pengguna?.nama }}
+        </RouterLink>
         <button class="w-full rounded-lg px-4 py-2.5 text-left text-text-muted hover:bg-bg" @click="keluar">
           Keluar
         </button>

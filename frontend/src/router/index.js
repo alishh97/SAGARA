@@ -9,6 +9,7 @@ import ChatbotView from '@/views/ChatbotView.vue'
 import AnalisisFotoView from '@/views/AnalisisFotoView.vue'
 import RiwayatView from '@/views/RiwayatView.vue'
 import RiwayatDetailView from '@/views/RiwayatDetailView.vue'
+import ProfilView from '@/views/ProfilView.vue'
 import AdminLoginView from '@/views/admin/AdminLoginView.vue'
 import AdminStatistikView from '@/views/admin/AdminStatistikView.vue'
 import AdminPenggunaView from '@/views/admin/AdminPenggunaView.vue'
@@ -28,6 +29,7 @@ const router = createRouter({
     { path: '/analisis-foto', component: AnalisisFotoView },
     { path: '/riwayat', component: RiwayatView },
     { path: '/riwayat/:idWadah', component: RiwayatDetailView },
+    { path: '/profil', component: ProfilView },
     // Panel admin (view-only)
     { path: '/admin/login', component: AdminLoginView, meta: { tamu: true, admin: true } },
     { path: '/admin', redirect: '/admin/statistik' },
