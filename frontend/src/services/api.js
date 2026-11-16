@@ -1,6 +1,9 @@
 // Pemanggil REST API backend. Token JWT disertakan otomatis di header Authorization.
 async function permintaan(url, opsi = {}) {
-  const token = localStorage.getItem('token')
+  // Panel admin memakai token terpisah agar sesi admin dan pengguna tidak tercampur
+  const modeAdmin = url.startsWith('/admin')
+  const kunciToken = modeAdmin ? 'tokenAdmin' : 'token'
+  const token = localStorage.getItem(kunciToken)
   const headers = { ...(opsi.headers || {}) }
 
   if (token) headers.Authorization = `Bearer ${token}`
@@ -20,10 +23,16 @@ async function permintaan(url, opsi = {}) {
   const data = await respons.json().catch(() => ({}))
 
   if (respons.status === 401 && token) {
-    // Sesi berakhir: hapus token dan kembali ke halaman login
-    localStorage.removeItem('token')
-    localStorage.removeItem('pengguna')
-    window.location.href = '/login'
+    // Sesi berakhir: hapus token dan kembali ke halaman login yang sesuai
+    if (modeAdmin) {
+      localStorage.removeItem('tokenAdmin')
+      localStorage.removeItem('admin')
+      window.location.href = '/admin/login'
+    } else {
+      localStorage.removeItem('token')
+      localStorage.removeItem('pengguna')
+      window.location.href = '/login'
+    }
   }
   if (!respons.ok) {
     throw { status: respons.status, ...data }

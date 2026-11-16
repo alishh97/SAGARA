@@ -16,6 +16,9 @@ app.use('/api/wadah', wadahRoutes);
 const chatRoutes = require('./routes/chat');
 app.use('/api/chat', chatRoutes);
 
+const adminRoutes = require('./routes/admin');
+app.use('/api/admin', adminRoutes);
+
 const path = require('path');
 const analisisFotoRoutes = require('./routes/analisisFoto');
 app.use('/api/analisis-foto', analisisFotoRoutes);
@@ -37,6 +40,28 @@ app.get('/api/health', async (req, res) => {
 pool
   .query('ALTER TABLE log_penggunaan_ai ADD COLUMN IF NOT EXISTS jumlah_token INT NOT NULL DEFAULT 0')
   .catch((err) => console.error('Gagal memperbarui tabel log_penggunaan_ai:', err.message));
+
+// Membuat akun admin dari .env (ADMIN_EMAIL dan ADMIN_PASSWORD) jika belum ada.
+// Admin dipegang pengembang, jadi tidak ada halaman registrasi admin.
+async function siapkanAdmin() {
+  const email = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+  const kataSandi = process.env.ADMIN_PASSWORD;
+  if (!email || !kataSandi) return;
+  try {
+    const bcrypt = require('bcrypt');
+    const hash = await bcrypt.hash(kataSandi, 10);
+    await pool.query(
+      `INSERT INTO pengguna (nama, email, kata_sandi_hash, peran)
+       VALUES ('Admin SAGARA', $1, $2, 'ADMIN')
+       ON CONFLICT (email) DO UPDATE SET peran = 'ADMIN', kata_sandi_hash = EXCLUDED.kata_sandi_hash`,
+      [email, hash]
+    );
+    console.log('Akun admin siap:', email);
+  } catch (err) {
+    console.error('Gagal menyiapkan akun admin:', err.message);
+  }
+}
+siapkanAdmin();
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server SAGARA berjalan di port ${PORT}`));

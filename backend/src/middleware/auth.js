@@ -12,6 +12,7 @@ function verifikasiToken(req, res, next) {
   try {
     const data = jwt.verify(token, process.env.JWT_SECRET);
     req.idPengguna = data.idPengguna;
+    req.peran = data.peran;
     next();
   } catch (err) {
     return res.status(401).json({ pesan: 'Sesi tidak valid atau sudah berakhir' });
